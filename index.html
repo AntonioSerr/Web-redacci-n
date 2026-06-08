@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Writing Trainer — Practica tu escritura en idiomas extranjeros con corrección por IA, vocabulario y gramática.">
+  <title>✍️ Writing Trainer — Practica tu Escritura</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Highlight.js for code blocks (optional but good for markdown) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+
+  <!-- Marked.js for Markdown parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    // Configure marked to use highlight.js
+    marked.setOptions({
+      highlight: function(code, lang) {
+        const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+        return hljs.highlight(code, { language }).value;
+      }
+    });
+  </script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ============ API Keys Modal ============ -->
+  <div id="api-keys-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <h2>🔑 Configuración de API Keys</h2>
+      <p>Introduce tus API keys para comenzar</p>
+      <div class="input-group">
+        <label for="gemini-key-input">Gemini API Key</label>
+        <input type="password" id="gemini-key-input" placeholder="Tu API Key de Gemini">
+      </div>
+      <p class="hint">La clave se guarda localmente en tu navegador de forma segura.</p>
+      <button id="save-keys-btn" class="btn-primary">Guardar y Continuar</button>
+    </div>
+  </div>
+
+  <!-- ============ Theme Panel Removed ============ -->
+  <!-- ============ Header ============ -->
+  <header>
+    <div class="header-left">
+      <h1>✍️ Writing Trainer</h1>
+    </div>
+    <div class="header-controls">
+      <select id="native-language-select" aria-label="Idioma nativo">
+        <option value="Español" selected>🇪🇸 Español</option>
+        <option value="English">🇬🇧 English</option>
+        <option value="Français">🇫🇷 Français</option>
+        <option value="Deutsch">🇩🇪 Deutsch</option>
+        <option value="Italiano">🇮🇹 Italiano</option>
+        <option value="Português">🇧🇷 Português</option>
+      </select>
+      <select id="target-language-select" aria-label="Idioma objetivo">
+        <option value="English" selected>🇬🇧 English</option>
+        <option value="Français">🇫🇷 Français</option>
+        <option value="Deutsch">🇩🇪 Deutsch</option>
+        <option value="Italiano">🇮🇹 Italiano</option>
+        <option value="Português">🇧🇷 Português</option>
+      </select>
+      <select id="ai-model-select" aria-label="Modelo de IA">
+        <option value="gemini" selected>✨ Gemini 3.1 Flash Lite</option>
+      </select>
+      <select id="level-select" aria-label="Nivel de idioma">
+        <option value="A1">A1</option>
+        <option value="A2">A2</option>
+        <option value="B1" selected>B1</option>
+        <option value="B2">B2</option>
+        <option value="C1">C1</option>
+        <option value="C2">C2</option>
+      </select>
+      <button id="settings-btn" class="btn-icon" title="Cambiar API Keys">⚙️</button>
+    </div>
+  </header>
+
+  <!-- ============ Navigation Tabs ============ -->
+  <nav id="main-nav">
+    <button class="nav-tab active" data-mode="writing" id="nav-tab-writing">📝 Redacción</button>
+    <button class="nav-tab" data-mode="vocabulary" id="nav-tab-vocabulary">📚 Vocabulario</button>
+    <button class="nav-tab" data-mode="structures" id="nav-tab-structures">🏗️ Estructuras</button>
+    <button class="nav-tab" data-mode="errors" id="nav-tab-errors">🗃️ Mi Almacén</button>
+    <button class="nav-tab" data-mode="chat" id="nav-tab-chat">💬 Chat Tutor</button>
+    <div class="nav-stats">
+      <span id="vocab-count" class="stat-badge">📚 0</span>
+      <span id="struct-count" class="stat-badge">🏗️ 0</span>
+    </div>
+  </nav>
+
+  <!-- ============ MODE 1: Writing Practice ============ -->
+  <section id="writing-mode" class="mode-section active">
+
+    <!-- Topic area -->
+    <div class="card topic-card">
+      <div class="card-header"><h2>📌 Tema</h2></div>
+      <div class="topic-row">
+        <input type="text" id="topic-input" placeholder="Escribe un tema o genera uno aleatorio...">
+        <button id="suggest-topic-btn" class="btn-secondary">🎲 Sugerir Tema</button>
+      </div>
+      <p id="topic-description" class="topic-desc"></p>
+    </div>
+
+    <!-- Vocabulary panel -->
+    <div class="card vocab-suggest-card">
+      <div class="card-header">
+        <h2>💡 Vocabulario Sugerido</h2>
+        <button id="load-vocab-btn" class="btn-secondary">📚 Generar Vocabulario</button>
+      </div>
+      <div id="vocab-suggest-content" class="vocab-grid"></div>
+    </div>
+
+    <!-- Writing area -->
+    <div class="card writing-card">
+      <div class="card-header">
+        <h2>✏️ Tu Redacción</h2>
+        <span id="word-count" class="word-count">0 palabras</span>
+      </div>
+      <textarea id="writing-textarea" placeholder="Escribe tu redacción aquí..."></textarea>
+      <div class="writing-actions">
+        <button id="submit-writing-btn" class="btn-primary btn-large">🚀 Enviar para Revisión</button>
+      </div>
+    </div>
+
+    <!-- Review results (hidden initially) -->
+    <div id="review-results" class="review-container" style="display:none;">
+      <div class="review-main">
+        <div class="card">
+          <div class="card-header"><h2>🔍 Tu Texto Corregido</h2></div>
+          <div id="corrected-text" class="corrected-text"></div>
+        </div>
+        <div class="card feedback-card">
+          <div class="card-header"><h2>💬 Comentario del Profesor IA</h2></div>
+          <div id="feedback-content" class="feedback-content"></div>
+        </div>
+      </div>
+      <div class="review-sidebar" id="review-sidebar">
+        <button id="toggle-sidebar-btn" class="sidebar-toggle">◀ Reescritura</button>
+        <div class="sidebar-content">
+          <div class="card">
+            <div class="card-header"><h2>✅ Versión Perfecta</h2></div>
+            <div id="rewritten-text" class="rewritten-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============ MODE 2: Vocabulary Practice ============ -->
+  <section id="vocabulary-mode" class="mode-section">
+    <div class="practice-container">
+      <div class="card practice-card">
+
+        <!-- Empty state -->
+        <div id="vocab-empty" class="empty-state">
+          <span class="empty-icon">📚</span>
+          <h2>Sin errores de vocabulario</h2>
+          <p>Escribe redacciones en el Modo 1 para que la IA detecte tus errores de vocabulario.</p>
+        </div>
+
+        <!-- Practice state -->
+        <div id="vocab-practice" style="display:none;">
+          <div class="practice-header">
+            <h2>📚 Practica tu Vocabulario</h2>
+            <div class="practice-progress">
+              <span id="vocab-progress">0 / 0</span>
+              <div class="progress-bar"><div id="vocab-progress-bar" class="progress-fill"></div></div>
+            </div>
+          </div>
+          <div class="flashcard">
+            <div class="flashcard-label">Traducción en tu idioma nativo:</div>
+            <div id="vocab-native-word" class="flashcard-word"></div>
+            <div id="vocab-streak" class="streak-info"></div>
+          </div>
+          <div class="answer-area">
+            <input type="text" id="vocab-answer-input" placeholder="Escribe la palabra en el idioma objetivo..." autocomplete="off">
+            <button id="vocab-check-btn" class="btn-primary">Verificar</button>
+          </div>
+          <div id="vocab-feedback" class="practice-feedback"></div>
+          <button id="vocab-next-btn" class="btn-secondary" style="display:none;">Siguiente →</button>
+        </div>
+
+        <!-- Complete state -->
+        <div id="vocab-complete" class="empty-state" style="display:none;">
+          <span class="empty-icon">🎉</span>
+          <h2>¡Sesión completada!</h2>
+          <p>Has repasado todo el vocabulario de esta sesión.</p>
+          <button id="vocab-restart-btn" class="btn-primary">Reiniciar Sesión</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: Structure Practice ============ -->
+  <section id="structures-mode" class="mode-section">
+    <div class="practice-container">
+      <div class="card practice-card">
+
+        <!-- Empty state -->
+        <div id="struct-empty" class="empty-state">
+          <span class="empty-icon">🏗️</span>
+          <h2>Sin errores de estructura</h2>
+          <p>Escribe redacciones en el Modo 1 para que la IA detecte tus errores gramaticales.</p>
+        </div>
+
+        <!-- Practice state -->
+        <div id="struct-practice" style="display:none;">
+          <div class="practice-header">
+            <h2>🏗️ Practica tus Estructuras</h2>
+            <div class="practice-progress">
+              <span id="struct-progress">0 / 0</span>
+              <div class="progress-bar"><div id="struct-progress-bar" class="progress-fill"></div></div>
+            </div>
+          </div>
+          <div class="structure-info">
+            <div class="rule-card">
+              <div class="rule-label">Regla gramatical:</div>
+              <div id="struct-rule" class="rule-text"></div>
+            </div>
+            <div class="explanation-card">
+              <div class="rule-label">Explicación:</div>
+              <div id="struct-explanation" class="explanation-text"></div>
+            </div>
+            <div class="original-card">
+              <div class="rule-label">Tu frase errónea original:</div>
+              <div id="struct-original" class="original-text"></div>
+            </div>
+            <div class="correction-card">
+              <div class="rule-label">Corrección sugerida por la IA:</div>
+              <div id="struct-correction" class="correction-text"></div>
+            </div>
+          </div>
+          <div class="answer-area struct-answer-area">
+            <p class="instruction">Escribe <strong>3 frases nuevas y diferentes</strong> aplicando correctamente esta regla:</p>
+            <div class="sentence-input-group">
+              <label for="struct-sentence-1">Frase 1:</label>
+              <textarea id="struct-sentence-1" class="struct-sentence" placeholder="Escribe tu primera frase..." rows="2"></textarea>
+            </div>
+            <div class="sentence-input-group">
+              <label for="struct-sentence-2">Frase 2:</label>
+              <textarea id="struct-sentence-2" class="struct-sentence" placeholder="Escribe tu segunda frase..." rows="2"></textarea>
+            </div>
+            <div class="sentence-input-group">
+              <label for="struct-sentence-3">Frase 3:</label>
+              <textarea id="struct-sentence-3" class="struct-sentence" placeholder="Escribe tu tercera frase..." rows="2"></textarea>
+            </div>
+            <button id="struct-check-btn" class="btn-primary">🤖 Verificar las 3 frases con IA</button>
+          </div>
+          <div id="struct-feedback" class="struct-evaluations"></div>
+          <button id="struct-next-btn" class="btn-secondary" style="display:none;">Siguiente →</button>
+        </div>
+
+        <!-- Complete state -->
+        <div id="struct-complete" class="empty-state" style="display:none;">
+          <span class="empty-icon">🎉</span>
+          <h2>¡Sesión completada!</h2>
+          <p>Has repasado todas las estructuras de esta sesión.</p>
+          <button id="struct-restart-btn" class="btn-primary">Reiniciar Sesión</button>
+        </div>
+
+      </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 4: Error Warehouse ============ -->
+  <section id="errors-mode" class="mode-section">
+    <div class="card">
+      <div class="card-header">
+        <h2>🗃️ Mi Almacén de Errores</h2>
+        <button id="refresh-errors-btn" class="btn-icon" title="Refrescar">🔄</button>
+      </div>
+      <div class="warehouse-container">
+        <!-- Vocab -->
+        <div class="warehouse-column">
+          <h3>📚 Vocabulario</h3>
+          <div id="warehouse-vocab-list" class="warehouse-list"></div>
+        </div>
+        <!-- Structures -->
+        <div class="warehouse-column">
+          <h3>🏗️ Estructuras</h3>
+          <div id="warehouse-struct-list" class="warehouse-list"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 5: Chat Tutor ============ -->
+  <section id="chat-mode" class="mode-section">
+    <div class="card chat-card">
+      <div class="card-header"><h2>💬 Chat Tutor</h2></div>
+      <div id="chat-history" class="chat-history">
+        <div class="chat-bubble tutor">
+          <div class="bubble-content">¡Hola! Soy tu tutor. ¿De qué quieres hablar o qué dudas tienes?</div>
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <input type="text" id="chat-input" placeholder="Escribe tu mensaje..." autocomplete="off">
+        <button id="chat-send-btn" class="btn-primary">Enviar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AI Toast (non-blocking) ============ -->
+  <div id="ai-toast" class="ai-toast" style="display:none;">
+    <div class="ai-toast-spinner"></div>
+    <span id="ai-toast-text">Procesando con IA...</span>
+  </div>
+
+  <!-- ============ Cost Footer ============ -->
+  <footer id="cost-footer" class="cost-footer">
+    <div class="cost-content">
+      <span class="cost-item">💰 Sesión: <strong id="cost-total">$0.0000</strong></span>
+      <span class="cost-separator">|</span>
+      <span class="cost-item">📥 <span id="cost-tokens-in">0</span> in</span>
+      <span class="cost-separator">|</span>
+      <span class="cost-item">📤 <span id="cost-tokens-out">0</span> out</span>
+      <span class="cost-separator">|</span>
+      <span class="cost-item" id="cost-model">✨ Gemini 3.1 Flash Lite</span>
+    </div>
+  </footer>
+
+</div>
+
+<!-- Scripts -->
+<script src="js/storage.js"></script>
+<script src="js/api.js"></script>
+<script src="js/llm.js"></script>
+<script src="js/vocabulary.js"></script>
+<script src="js/structures.js"></script>
+<script src="js/writing.js"></script>
+<script src="js/errors.js"></script>
+<script src="js/chat.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
