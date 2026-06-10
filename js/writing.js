@@ -341,6 +341,22 @@ function renderReview(data, originalText) {
     rewrittenEl.textContent = data.rewritten_text || '';
   }
 
+  // Render exam coaching
+  var examCoachingContainer = document.getElementById('exam-coaching-container');
+  var examCoachingContent = document.getElementById('exam-coaching-content');
+  if (examCoachingContainer && examCoachingContent) {
+    if (data.exam_coaching) {
+      if (typeof marked !== 'undefined') {
+        examCoachingContent.innerHTML = marked.parse(data.exam_coaching);
+      } else {
+        examCoachingContent.textContent = data.exam_coaching;
+      }
+      examCoachingContainer.style.display = 'block';
+    } else {
+      examCoachingContainer.style.display = 'none';
+    }
+  }
+
   // Render feedback
   renderFeedback(data.feedback || {});
 

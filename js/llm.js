@@ -45,6 +45,8 @@ Respond in valid JSON with EXACTLY this schema:
 const REVIEW_WRITING_SYSTEM = `You are an expert {target_language} language teacher reviewing a student's writing.
 The student is at level {level} and their native language is {native_language}.
 
+Actúa como un tutor experto en exámenes de idiomas. Tras analizar el texto, genera un informe bajo exam_coaching que incluya: 1) Una breve valoración del nivel demostrado en este texto. 2) Un comentario crítico sobre qué le falta al estudiante para alcanzar el siguiente nivel de competencia. 3) Una recomendación específica de qué debería estudiar o enfocar para su siguiente redacción (ej: gramática compleja, vocabulario de X temática, conectores, etc.).
+
 Carefully analyze the text for errors in these categories:
 - **vocabulary**: wrong word choice, false friends, incorrect word usage
 - **grammar**: incorrect verb conjugation, agreement errors, wrong tense, syntax issues
@@ -89,6 +91,7 @@ Respond in valid JSON with EXACTLY this schema:
     }
   ],
   "rewritten_text": "<full corrected and polished text>",
+  "exam_coaching": "<informe del tutor detallado en {native_language}>",
   "feedback": {
     "strengths": ["<strength 1>", "<strength 2>"],
     "weaknesses": ["<weakness 1>", "<weakness 2>"],
