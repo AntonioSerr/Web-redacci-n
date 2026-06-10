@@ -41,12 +41,14 @@ function getSettings() {
   var targetSelect = document.getElementById('target-language-select');
   var nativeSelect = document.getElementById('native-language-select');
   var levelSelect = document.getElementById('level-select');
+  var severitySelect = document.getElementById('severity-select');
 
   return {
     provider: 'gemini', // Hardcoded as per refactor
     targetLanguage: targetSelect ? targetSelect.value : 'English',
     nativeLanguage: nativeSelect ? nativeSelect.value : 'Español',
     level: levelSelect ? levelSelect.value : 'B1',
+    severity: severitySelect ? severitySelect.value : 'Exigente',
     geminiKey: localStorage.getItem('wt_gemini_key') || ''
   };
 }
@@ -59,7 +61,8 @@ function restoreSettings() {
     'ai-model-select': 'wt_model',
     'target-language-select': 'wt_target_lang',
     'native-language-select': 'wt_native_lang',
-    'level-select': 'wt_level'
+    'level-select': 'wt_level',
+    'severity-select': 'wt_severity'
   };
 
   Object.keys(mappings).forEach(function(selectId) {
@@ -87,7 +90,8 @@ function setupSelectPersistence() {
     'ai-model-select': 'wt_model',
     'target-language-select': 'wt_target_lang',
     'native-language-select': 'wt_native_lang',
-    'level-select': 'wt_level'
+    'level-select': 'wt_level',
+    'severity-select': 'wt_severity'
   };
 
   Object.keys(mappings).forEach(function(selectId) {

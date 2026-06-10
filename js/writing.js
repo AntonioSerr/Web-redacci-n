@@ -271,10 +271,19 @@ async function submitWriting() {
 
   var btn = document.getElementById('submit-writing-btn');
   try {
+    var severityMap = {
+      'Suave': 'Empático, constructivo, motivador pero sin omitir ningún error.',
+      'Normal': 'Profesional, objetivo y directo.',
+      'Exigente': 'Estricto, técnico, sin adornos ni frases de relleno.',
+      'Cabrón': 'Sarcástico, humillante, burlón, que se ría de los fallos, pero que NO OMITA NINGÚN ERROR. Debe señalar cada fallo como si fuera una tragedia griega o una muestra de incompetencia absoluta.'
+    };
+    var severityTone = severityMap[settings.severity] || severityMap['Exigente'];
+
     var systemInstruction = formatPrompt(REVIEW_WRITING_SYSTEM, {
       target_language: settings.targetLanguage,
       native_language: settings.nativeLanguage,
-      level: settings.level
+      level: settings.level,
+      severity_tone: severityTone
     });
     
     var userPrompt = `Topic: ${topic}\n\nStudent Text:\n${text}`;

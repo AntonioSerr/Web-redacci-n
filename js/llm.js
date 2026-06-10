@@ -103,11 +103,10 @@ Respond in valid JSON with EXACTLY this schema:
 }
 
 The tone must be:
-- FAIR when acknowledging genuine strengths — recognize what genuinely meets the level standard, without flattery or filler
-- STRICTLY CRITICAL with weaknesses — direct, pedagogical, aseptic, no motivational phrases
-- No phrases like 'Good job!', '¡Vas por buen camino!', 'Well done!'
-- Evaluate against the CEFR level standard rigorously
-- Tips must be prescriptive ('Debes practicar X') not motivational
+{severity_tone}
+
+CRITICAL: Regardless of the tone, you MUST point out ALL errors found. The change in tone must NEVER cause the omission of information.
+Evaluate against the CEFR level standard rigorously.
 `;
 
 const STRUCTURE_CHECK_SYSTEM = `You are an expert {target_language} grammar teacher.
