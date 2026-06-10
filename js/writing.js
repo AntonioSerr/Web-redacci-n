@@ -3,6 +3,7 @@
    ============================================ */
 
 var activeTooltip = null;
+var suggestedTopics = [];
 
 /**
  * Initialize writing practice mode.
@@ -65,7 +66,12 @@ async function suggestTopic() {
     if (btn) { btn.disabled = true; btn.textContent = 'Generando tema...'; }
     showAiToast('Generando tema...');
     
-    var response = await callGeminiAPI(systemInstruction, "Suggest a typical exam topic for this level. Pick a completely random category each time.", true, 1.2);
+    var userPrompt = "Suggest a typical exam topic for this level. Pick a completely random category each time.";
+    if (suggestedTopics.length > 0) {
+      userPrompt += " DO NOT suggest any of these topics: " + suggestedTopics.join(', ');
+    }
+    
+    var response = await callGeminiAPI(systemInstruction, userPrompt, true, 1.7);
     var data = response.data;
 
     var topicInput = document.getElementById('topic-input');
@@ -73,6 +79,10 @@ async function suggestTopic() {
 
     if (topicInput && data.topic) {
       topicInput.value = data.topic;
+      suggestedTopics.push(data.topic);
+      if (suggestedTopics.length > 10) {
+        suggestedTopics.shift();
+      }
     }
     if (topicDesc && data.description) {
       topicDesc.textContent = data.description;
@@ -273,7 +283,7 @@ async function submitWriting() {
     if (btn) { btn.disabled = true; btn.textContent = 'Revisando texto...'; }
     showAiToast('La IA está revisando tu texto...');
     
-    var response = await callGeminiAPI(systemInstruction, userPrompt, true);
+    var response = await callGeminiAPI(systemInstruction, userPrompt, true, 0.2);
     var data = response.data;
     
     // Save errors locally
@@ -345,58 +355,72 @@ function renderCorrectedText(errors, originalText) {
     return;
   }
 
-  // Find exact indices for each error
   var mappedErrors = [];
-  var searchStartIndex = 0;
-  
-  // We should try to find them in the general order the LLM provided
+  var markedRanges = [];
+
   errors.forEach(function(error, idx) {
     if (!error.original_text) return;
-    var start = originalText.indexOf(error.original_text, searchStartIndex);
-    if (start === -1) {
-      start = originalText.indexOf(error.original_text); // Try from beginning
+    
+    var occurrences = [];
+    var pos = originalText.indexOf(error.original_text);
+    while (pos !== -1) {
+      occurrences.push(pos);
+      pos = originalText.indexOf(error.original_text, pos + 1);
     }
-    if (start !== -1) {
+    
+    var validOccurrences = occurrences.filter(function(start) {
+      var end = start + error.original_text.length;
+      return !markedRanges.some(function(range) {
+        return Math.max(start, range.start) < Math.min(end, range.end);
+      });
+    });
+
+    if (validOccurrences.length > 0) {
+      var start;
+      if (typeof error.start_index !== 'undefined') {
+        var closest = validOccurrences[0];
+        var minDiff = Math.abs(closest - error.start_index);
+        for (var i = 1; i < validOccurrences.length; i++) {
+          var diff = Math.abs(validOccurrences[i] - error.start_index);
+          if (diff < minDiff) {
+            minDiff = diff;
+            closest = validOccurrences[i];
+          }
+        }
+        start = closest;
+      } else {
+        start = validOccurrences[0];
+      }
+
+      var end = start + error.original_text.length;
+
       mappedErrors.push({
         type: error.type,
         original_text: error.original_text,
         correction: error.correction,
         explanation: error.explanation,
         exactStart: start,
-        exactEnd: start + error.original_text.length,
+        exactEnd: end,
         idx: idx
       });
-      searchStartIndex = start + error.original_text.length;
+      
+      markedRanges.push({ start: start, end: end });
     }
   });
 
-  // Sort by exactStart
   mappedErrors.sort(function(a, b) {
     return a.exactStart - b.exactStart;
   });
 
-  // Remove overlapping errors
-  var filtered = [];
-  var lastEnd = -1;
-  mappedErrors.forEach(function(error) {
-    if (error.exactStart >= lastEnd) {
-      filtered.push(error);
-      lastEnd = error.exactEnd;
-    }
-  });
-
-  // Build highlighted HTML
   var html = '';
   var lastIndex = 0;
 
-  filtered.forEach(function(error) {
+  mappedErrors.forEach(function(error) {
     var start = error.exactStart;
     var end = error.exactEnd;
 
-    // Text before error
     html += escapeHtml(originalText.substring(lastIndex, start));
 
-    // Error span
     html += '<span class="error-highlight" ' +
       'data-error-idx="' + error.idx + '" ' +
       'data-original="' + escapeAttr(error.original_text) + '" ' +
@@ -408,12 +432,10 @@ function renderCorrectedText(errors, originalText) {
     lastIndex = end;
   });
 
-  // Remaining text
   html += escapeHtml(originalText.substring(lastIndex));
 
   container.innerHTML = html;
 
-  // Attach click listeners to error spans
   var spans = container.querySelectorAll('.error-highlight');
   spans.forEach(function(span) {
     span.addEventListener('click', function(e) {
