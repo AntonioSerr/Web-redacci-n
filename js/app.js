@@ -48,7 +48,7 @@ function getSettings() {
     targetLanguage: targetSelect ? targetSelect.value : 'English',
     nativeLanguage: nativeSelect ? nativeSelect.value : 'Español',
     level: levelSelect ? levelSelect.value : 'B1',
-    severity: severitySelect ? severitySelect.value : 'Exigente',
+    severity: severitySelect ? severitySelect.value : 'Normal',
     geminiKey: localStorage.getItem('wt_gemini_key') || ''
   };
 }

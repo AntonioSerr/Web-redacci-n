@@ -272,12 +272,12 @@ async function submitWriting() {
   var btn = document.getElementById('submit-writing-btn');
   try {
     var severityMap = {
-      'Suave': 'Eres un profesor maternal y extremadamente empático. Señala cada error, pero casi discúlpate por hacerlo. Usa un tono cálido, consolador y añade emojis de apoyo (💖, 🥺, ✨). Hazle sentir que el error es comprensible y que su esfuerzo es maravilloso, aunque el texto sea un desastre.',
+      'Suave': 'Eres un profesor de idiomas muy empático, alentador y positivo. Tu objetivo es corregir señalando todos los fallos, pero manteniendo la motivación del alumno al máximo. Usa abundantes emojis de apoyo en tus explicaciones (✨, 💪, 💡, 👏, 😊) y frases motivacionales cortas al estilo: ¡Buen intento!, ¡Vas por buen camino! o ¡Casi lo tienes!. REGLA ESTRICTA INQUEBRANTABLE: Mantén la distancia profesional; está totalmente PROHIBIDO usar apelativos cariñosos, diminutivos o términos excesivamente familiares (como cielo, cariño, corazón, amor, etc.).',
       'Normal': 'Eres un corrector automático. Tono neutro, aséptico, puramente académico y al grano. Solo los hechos.',
       'Exigente': 'Eres un sargento instructor implacable y frío. Cero empatía, cero adornos. Usa frases cortas y contundentes. Si comete un error básico, recálcalo como inaceptable para su nivel. Tu objetivo es la disciplina.',
       'Cabrón': 'Eres un crítico despiadado, sarcástico y cruel. Tu objetivo es humillar intelectualmente al alumno por cada error que cometa, riéndote de su ignorancia. Usa sarcasmo, ironía y condescendencia extrema en CADA explicación de los errores y en el feedback. Hazle dudar de si alguna vez aprenderá el idioma. (NOTA CRÍTICA: A pesar de los insultos, DEBES proporcionar la corrección técnica exacta y real).'
     };
-    var severityTone = severityMap[settings.severity] || severityMap['Exigente'];
+    var severityTone = severityMap[settings.severity] || severityMap['Normal'];
 
     var systemInstruction = formatPrompt(REVIEW_WRITING_SYSTEM, {
       target_language: settings.targetLanguage,
@@ -347,9 +347,11 @@ function renderReview(data, originalText) {
   if (examCoachingContainer && examCoachingContent) {
     if (data.exam_coaching) {
       if (typeof marked !== 'undefined') {
-        examCoachingContent.innerHTML = marked.parse(data.exam_coaching);
+        examCoachingContent.innerHTML = marked.parse(data.exam_coaching.trim());
+        examCoachingContent.style.whiteSpace = 'normal';
       } else {
-        examCoachingContent.textContent = data.exam_coaching;
+        examCoachingContent.textContent = data.exam_coaching.trim();
+        examCoachingContent.style.whiteSpace = 'pre-wrap';
       }
       examCoachingContainer.style.display = 'block';
     } else {

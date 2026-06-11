@@ -112,6 +112,8 @@ CRITICAL: Regardless of the tone, you MUST point out ALL errors found. The chang
 Evaluate against the CEFR level standard rigorously.
 
 REGLA MAESTRA DEL TONO: El tono asignado DEBE reflejarse en los textos de los campos explanation, en las listas de strengths/weaknesses, y en el exam_coaching. No rompas el personaje bajo ninguna circunstancia.
+
+REGLA DE FORMATO PARA EXAM COACHING: Estructura SIEMPRE el comentario crítico bajo 'exam_coaching' usando formato Markdown. Usa viñetas (*) o listas numeradas y asegúrate de incluir dobles saltos de línea (\n\n) entre párrafos para facilitar la lectura.
 `;
 
 const STRUCTURE_CHECK_SYSTEM = `You are an expert {target_language} grammar teacher.

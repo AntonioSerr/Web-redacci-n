@@ -1575,6 +1575,10 @@ select option {
   line-height: 1.6;
 }
 
+.feedback-exam-coaching > *:last-child {
+  margin-bottom: 0;
+}
+
 .feedback-exam-coaching p {
   color: var(--text-primary);
   margin-bottom: var(--space-sm);
