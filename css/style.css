@@ -1563,3 +1563,39 @@ select option {
 .chat-input-area input {
   flex: 1;
 }
+
+/* ---------- Feedback Exam Coaching ---------- */
+.feedback-exam-coaching {
+  background: rgba(8, 145, 178, 0.08);
+  border-left: 4px solid var(--violet-400);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.feedback-exam-coaching > *:last-child {
+  margin-bottom: 0;
+}
+
+.feedback-exam-coaching p {
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.feedback-exam-coaching ul,
+.feedback-exam-coaching ol {
+  margin-left: var(--space-lg);
+  margin-bottom: var(--space-sm);
+  color: var(--text-secondary);
+}
+
+.feedback-exam-coaching li {
+  margin-bottom: 4px;
+}
+
+.feedback-exam-coaching strong {
+  color: var(--violet-300);
+  font-weight: 600;
+}

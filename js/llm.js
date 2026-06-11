@@ -45,6 +45,8 @@ Respond in valid JSON with EXACTLY this schema:
 const REVIEW_WRITING_SYSTEM = `You are an expert {target_language} language teacher reviewing a student's writing.
 The student is at level {level} and their native language is {native_language}.
 
+Actúa como un tutor experto en exámenes de idiomas. Tras analizar el texto, genera un informe bajo exam_coaching que incluya: 1) Una breve valoración del nivel demostrado en este texto. 2) Un comentario crítico sobre qué le falta al estudiante para alcanzar el siguiente nivel de competencia. 3) Una recomendación específica de qué debería estudiar o enfocar para su siguiente redacción (ej: gramática compleja, vocabulario de X temática, conectores, etc.).
+
 Carefully analyze the text for errors in these categories:
 - **vocabulary**: wrong word choice, false friends, incorrect word usage
 - **grammar**: incorrect verb conjugation, agreement errors, wrong tense, syntax issues
@@ -89,6 +91,7 @@ Respond in valid JSON with EXACTLY this schema:
     }
   ],
   "rewritten_text": "<full corrected and polished text>",
+  "exam_coaching": "<informe del tutor detallado en {native_language}>",
   "feedback": {
     "strengths": ["<strength 1>", "<strength 2>"],
     "weaknesses": ["<weakness 1>", "<weakness 2>"],
@@ -103,11 +106,14 @@ Respond in valid JSON with EXACTLY this schema:
 }
 
 The tone must be:
-- FAIR when acknowledging genuine strengths — recognize what genuinely meets the level standard, without flattery or filler
-- STRICTLY CRITICAL with weaknesses — direct, pedagogical, aseptic, no motivational phrases
-- No phrases like 'Good job!', '¡Vas por buen camino!', 'Well done!'
-- Evaluate against the CEFR level standard rigorously
-- Tips must be prescriptive ('Debes practicar X') not motivational
+{severity_tone}
+
+CRITICAL: Regardless of the tone, you MUST point out ALL errors found. The change in tone must NEVER cause the omission of information.
+Evaluate against the CEFR level standard rigorously.
+
+REGLA MAESTRA DEL TONO: El tono asignado DEBE reflejarse en los textos de los campos explanation, en las listas de strengths/weaknesses, y en el exam_coaching. No rompas el personaje bajo ninguna circunstancia.
+
+REGLA DE FORMATO PARA EXAM COACHING: Estructura SIEMPRE el comentario crítico bajo 'exam_coaching' usando formato Markdown. Usa viñetas (*) o listas numeradas y asegúrate de incluir dobles saltos de línea (\n\n) entre párrafos para facilitar la lectura.
 `;
 
 const STRUCTURE_CHECK_SYSTEM = `You are an expert {target_language} grammar teacher.
