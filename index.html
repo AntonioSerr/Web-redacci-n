@@ -83,8 +83,8 @@
       </select>
       <select id="severity-select" aria-label="Severidad del Profesor">
         <option value="Suave">Suave</option>
-        <option value="Normal">Normal</option>
-        <option value="Exigente" selected>Exigente</option>
+        <option value="Normal" selected>Normal</option>
+        <option value="Exigente">Exigente</option>
         <option value="Cabrón">Cabrón</option>
       </select>
       <button id="settings-btn" class="btn-icon" title="Cambiar API Keys">⚙️</button>
@@ -148,6 +148,10 @@
         <div class="card feedback-card">
           <div class="card-header"><h2>💬 Comentario del Profesor IA</h2></div>
           <div id="feedback-content" class="feedback-content"></div>
+        </div>
+        <div class="card exam-coaching-card" id="exam-coaching-container" style="display:none;">
+          <div class="card-header"><h2>📈 Informe del Tutor (Exam Coaching)</h2></div>
+          <div id="exam-coaching-content" class="feedback-exam-coaching"></div>
         </div>
       </div>
       <div class="review-sidebar" id="review-sidebar">
