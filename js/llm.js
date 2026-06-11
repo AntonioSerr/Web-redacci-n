@@ -110,6 +110,8 @@ The tone must be:
 
 CRITICAL: Regardless of the tone, you MUST point out ALL errors found. The change in tone must NEVER cause the omission of information.
 Evaluate against the CEFR level standard rigorously.
+
+REGLA MAESTRA DEL TONO: El tono asignado DEBE reflejarse en los textos de los campos explanation, en las listas de strengths/weaknesses, y en el exam_coaching. No rompas el personaje bajo ninguna circunstancia.
 `;
 
 const STRUCTURE_CHECK_SYSTEM = `You are an expert {target_language} grammar teacher.

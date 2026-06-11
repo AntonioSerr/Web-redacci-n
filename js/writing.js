@@ -272,10 +272,10 @@ async function submitWriting() {
   var btn = document.getElementById('submit-writing-btn');
   try {
     var severityMap = {
-      'Suave': 'Empático, constructivo, motivador pero sin omitir ningún error.',
-      'Normal': 'Profesional, objetivo y directo.',
-      'Exigente': 'Estricto, técnico, sin adornos ni frases de relleno.',
-      'Cabrón': 'Sarcástico, humillante, burlón, que se ría de los fallos, pero que NO OMITA NINGÚN ERROR. Debe señalar cada fallo como si fuera una tragedia griega o una muestra de incompetencia absoluta.'
+      'Suave': 'Eres un profesor maternal y extremadamente empático. Señala cada error, pero casi discúlpate por hacerlo. Usa un tono cálido, consolador y añade emojis de apoyo (💖, 🥺, ✨). Hazle sentir que el error es comprensible y que su esfuerzo es maravilloso, aunque el texto sea un desastre.',
+      'Normal': 'Eres un corrector automático. Tono neutro, aséptico, puramente académico y al grano. Solo los hechos.',
+      'Exigente': 'Eres un sargento instructor implacable y frío. Cero empatía, cero adornos. Usa frases cortas y contundentes. Si comete un error básico, recálcalo como inaceptable para su nivel. Tu objetivo es la disciplina.',
+      'Cabrón': 'Eres un crítico despiadado, sarcástico y cruel. Tu objetivo es humillar intelectualmente al alumno por cada error que cometa, riéndote de su ignorancia. Usa sarcasmo, ironía y condescendencia extrema en CADA explicación de los errores y en el feedback. Hazle dudar de si alguna vez aprenderá el idioma. (NOTA CRÍTICA: A pesar de los insultos, DEBES proporcionar la corrección técnica exacta y real).'
     };
     var severityTone = severityMap[settings.severity] || severityMap['Exigente'];
 
